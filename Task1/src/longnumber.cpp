@@ -2,7 +2,7 @@
 
 
 
-#include "longnumber.hpp"
+#include "../include/longnumber.hpp"
 
 //LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {}
 
@@ -23,7 +23,7 @@ LongNumber LongNumber::operator+(const LongNumber& other) const {
 
     char carry = 0;
 
-    for (int ind = fmax(size1, size2) - 1; ind >= 0; --ind) {
+    for (size_t ind = fmax(size1, size2) - 1; ind >= 0; --ind) {
         char digit1 = (ind < size1) ? fractionalPart[ind] : 0;
         char digit2 = (ind < size2) ? other.fractionalPart[ind] : 0;
 
@@ -73,7 +73,7 @@ LongNumber LongNumber::operator-(const LongNumber& other) const {
 
     char borrow = 0;
 
-    for (int ind = fmax(size1, size2) - 1; ind >= 0; --ind) {
+    for (size_t ind = fmax(size1, size2) - 1; ind >= 0; --ind) {
         char digit1 = (ind < size1) ? fractionalPart[ind] : 0;
         char digit2 = (ind < size2) ? other.fractionalPart[ind] : 0;
 
@@ -127,7 +127,12 @@ LongNumber LongNumber::operator*(const LongNumber& other) const {
     return LongNumber(resultInteger, resultFractional, resultSign);
 }
 
-//LongNumber LongNumber::operator/(const LongNumber& other) const {}
+LongNumber LongNumber::operator/(const LongNumber& other) const
+{
+    (void) other;
+
+    return LongNumber(0);
+}
 
 LongNumber LongNumber::operator-() const {
     LongNumber result = *this;
