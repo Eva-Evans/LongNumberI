@@ -3,8 +3,76 @@
 
 
 #include "../include/longnumber.hpp"
+char LongNumber::AdditionDig(const char& dig1, const char& dig2, char& carry) const {
+        char sum = dig1 + dig2 + carry;
+        carry = sum / 10;
+        return sum % 10;
+    }
+char LongNumber::SubtractionDig(const char& dig1, const char& dig2, char& borrow) const {
+        char diff = dig1 - dig2 - borrow;
+        borrow = (diff < 0) ? 1 : 0;
+        return (borrow == 1) ? diff + 10 : diff;
+    }
+std::vector<char> LongNumber::MultiplicationDigComb(const std::vector<char>& num1, const std::vector<char>& num2) const {
+        std::vector<char> result(num1.size() + num2.size(), 0);
 
+        for (int i = num1.size() - 1; i >= 0; --i) {
+            char carry = 0;
+            for (int j = num2.size() - 1; j >= 0 || carry != 0; --j) {
+                char current = result[i + j + 1] + num1[i] * (j >= 0 ? num2[j] : 0) + carry;
+                result[i + j + 1] = current % 10;
+                carry = current / 10;
+            }
+        }
+
+        return result;
+    }
 //LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {}
+LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {
+    LongNumber low(0);
+    LongNumber high(1);
+    LongNumber epsilon(5E-1);
+
+    const LongNumber tenConst(10);
+    const LongNumber oneTenthConst(1E-1);
+    const LongNumber oneSecondConst(5E-1);
+
+    for (size_t i = 0; i < divisor.fractionalPart.size(); ++i) {
+        high = high * tenConst;
+    }
+
+    high *= dividend;
+
+    for (size_t i = 0; i < LongNumber::precision + 10; ++i) {
+        epsilon = epsilon * oneTenthConst;
+    }
+
+    while ((high - low) >= epsilon) {
+        LongNumber mid = (low + high) * oneSecondConst;
+        LongNumber multiplyResult = mid * divisor;
+
+        if (multiplyResult > dividend) {
+            high = mid;
+        } else {
+            low = mid;
+            if (multiplyResult == dividend) {
+                break;
+            }
+        }
+    }
+
+    low += epsilon;
+    std::vector<char> fractionalPartCropped(low.fractionalPart.begin(), min(low.fractionalPart.begin() + LongNumber::precision + 5, low.fractionalPart.end()));
+    
+    while (!fractionalPartCropped.empty() && !fractionalPartCropped.back()) {
+        fractionalPartCropped.pop_back();
+    }
+
+    low.fractionalPart = fractionalPartCropped;
+
+    return low;
+}
+
 
 LongNumber LongNumber::operator+(const LongNumber& other) const {
     if ((*this).sign == Sign::Negative && other.sign == Sign::Negative) {
@@ -127,11 +195,21 @@ LongNumber LongNumber::operator*(const LongNumber& other) const {
     return LongNumber(resultInteger, resultFractional, resultSign);
 }
 
-LongNumber LongNumber::operator/(const LongNumber& other) const
-{
-    (void) other;
+LongNumber LongNumber::operator/(const LongNumber& other) const {
 
-    return LongNumber(0);
+    if (other.sign == Sign::Positive){
+        if (sign == Sign::Positive){
+            return findApproximateDivision(*this, other);
+        } else {
+            return -findApproximateDivision(-*this, other);
+        }
+    } else {
+        if (sign == Sign::Positive){
+            return -findApproximateDivision(*this, -other);
+        } else {
+            return findApproximateDivision(-*this, -other);
+        }
+    }
 }
 
 LongNumber LongNumber::operator-() const {

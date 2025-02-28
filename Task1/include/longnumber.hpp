@@ -22,33 +22,9 @@ private:
     Sign sign;
     std::vector<char> integerPart;
     std::vector<char> fractionalPart;
-
-    char AdditionDig(const char& dig1, const char& dig2, char& carry) const {
-        char sum = dig1 + dig2 + carry;
-        carry = sum / 10;
-        return sum % 10;
-    }
-
-    char SubtractionDig(const char& dig1, const char& dig2, char& borrow) const {
-        char diff = dig1 - dig2 - borrow;
-        borrow = (diff < 0) ? 1 : 0;
-        return (borrow == 1) ? diff + 10 : diff;
-    }
-
-    std::vector<char> MultiplicationDigComb(const std::vector<char>& num1, const std::vector<char>& num2) const {
-        std::vector<char> result(num1.size() + num2.size(), 0);
-
-        for (int i = num1.size() - 1; i >= 0; --i) {
-            char carry = 0;
-            for (int j = num2.size() - 1; j >= 0 || carry != 0; --j) {
-                char current = result[i + j + 1] + num1[i] * (j >= 0 ? num2[j] : 0) + carry;
-                result[i + j + 1] = current % 10;
-                carry = current / 10;
-            }
-        }
-
-        return result;
-    }
+    char AdditionDig(const char& dig1, const char& dig2, char& carry) const;
+    char SubtractionDig(const char& dig1, const char& dig2, char& borrow) const;
+    std::vector<char> MultiplicationDigComb(const std::vector<char>& num1, const std::vector<char>& num2) const;
 
     friend LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor);
 
@@ -97,8 +73,48 @@ public:
             }
         }
 
-        //LongNumber(unsigned long long unsignedLongValue) {}
-       // LongNumber(double doubleValue) {}
+        LongNumber(unsigned long long unsignedLongValue) {
+            while (unsignedLongValue > 0) {
+                char digit = unsignedLongValue % 10;
+                unsignedLongValue /= 10;
+                integerPart.insert(integerPart.begin(), digit);
+            }
+
+            if (integerPart.empty()){
+                integerPart.push_back(0);
+            }
+        }
+       
+        LongNumber(double doubleValue) {
+            std::stringstream ss(std::to_string(doubleValue));
+            char ch;
+            
+            sign = (doubleValue >= 0) ? Sign::Positive : Sign::Negative;
+
+            while (ss.get(ch) && ch != '.') {
+                if (isdigit(ch)) {
+                    integerPart.push_back(ch - '0');
+                }
+            }
+
+            while (ss.get(ch)) {
+                if (isdigit(ch)) {
+                    fractionalPart.push_back(ch - '0');
+                }
+            }
+
+            while (!fractionalPart.empty() && !fractionalPart.back()) {
+                fractionalPart.pop_back();
+            }
+
+            if (integerPart.empty()){
+                integerPart.push_back(0);
+            }
+
+            if (fractionalPart.empty() && *integerPart.begin() == 0) {
+                sign = Sign::Positive;
+            }
+        }
 
         LongNumber(const std::vector<char>& integerPart_, const std::vector<char>& fractionalPart_, const Sign sign_ = Sign::Positive) {
             integerPart = integerPart_;
@@ -117,6 +133,12 @@ public:
                 sign = Sign::Positive;
             }
         }
+
+
+    LongNumber(const LongNumber& other) = default; //еонструктор копирования
+    LongNumber& operator=(const LongNumber& other) = default; //конструктор присваивания
+
+    ~LongNumber() = default;
     
        // LongNumber(const string& numberStr) {}
 
