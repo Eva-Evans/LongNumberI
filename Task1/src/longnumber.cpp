@@ -1,18 +1,122 @@
-
-
-
-
 #include "../include/longnumber.hpp"
+
+
+LongNumber::LongNumber(int intValue) {
+    sign = (intValue >= 0) ? Sign::Positive : Sign::Negative;
+    intValue = abs(intValue);
+
+    while (intValue > 0) {
+        char digit = intValue % 10;
+        intValue /= 10;
+        integerPart.insert(integerPart.begin(), digit);
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+}
+
+LongNumber::LongNumber(unsigned unsignedValue) {
+    while (unsignedValue > 0) {
+        char digit = unsignedValue % 10;
+        unsignedValue /= 10;
+        integerPart.insert(integerPart.begin(), digit);
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+}
+
+LongNumber::LongNumber(long long longValue) {
+    sign = (longValue >= 0) ? Sign::Positive : Sign::Negative;
+    longValue = abs(longValue);
+
+    while (longValue > 0) {
+        char digit = longValue % 10;
+        longValue /= 10;
+        integerPart.insert(integerPart.begin(), digit);
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+}
+
+LongNumber::LongNumber(unsigned long long unsignedLongValue) {
+    while (unsignedLongValue > 0) {
+        char digit = unsignedLongValue % 10;
+        unsignedLongValue /= 10;
+        integerPart.insert(integerPart.begin(), digit);
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+}
+
+LongNumber::LongNumber(double doubleValue) {
+    std::stringstream ss(std::to_string(doubleValue));
+    char ch;
+    
+    sign = (doubleValue >= 0) ? Sign::Positive : Sign::Negative;
+
+    while (ss.get(ch) && ch != '.') {
+        if (isdigit(ch)) {
+            integerPart.push_back(ch - '0');
+        }
+    }
+
+    while (ss.get(ch)) {
+        if (isdigit(ch)) {
+            fractionalPart.push_back(ch - '0');
+        }
+    }
+
+    while (!fractionalPart.empty() && !fractionalPart.back()) {
+        fractionalPart.pop_back();
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+
+    if (fractionalPart.empty() && *integerPart.begin() == 0) {
+        sign = Sign::Positive;
+    }
+}
+
+LongNumber::LongNumber(const std::vector<char>& integerPart_, const std::vector<char>& fractionalPart_, const Sign sign_) {
+    integerPart = integerPart_;
+    fractionalPart = fractionalPart_;
+    sign = sign_;
+
+    while (!fractionalPart.empty() && !fractionalPart.back()) {
+        fractionalPart.pop_back();
+    }
+
+    if (integerPart.empty()){
+        integerPart.push_back(0);
+    }
+
+    if (fractionalPart.empty() && *integerPart.begin() == 0) {
+        sign = Sign::Positive;
+    }
+}
+
+
 char LongNumber::AdditionDig(const char& dig1, const char& dig2, char& carry) const {
         char sum = dig1 + dig2 + carry;
         carry = sum / 10;
         return sum % 10;
     }
+
 char LongNumber::SubtractionDig(const char& dig1, const char& dig2, char& borrow) const {
         char diff = dig1 - dig2 - borrow;
         borrow = (diff < 0) ? 1 : 0;
         return (borrow == 1) ? diff + 10 : diff;
     }
+
 std::vector<char> LongNumber::MultiplicationDigComb(const std::vector<char>& num1, const std::vector<char>& num2) const {
         std::vector<char> result(num1.size() + num2.size(), 0);
 
@@ -27,12 +131,12 @@ std::vector<char> LongNumber::MultiplicationDigComb(const std::vector<char>& num
 
         return result;
     }
+
 //LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {}
 LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {
     LongNumber low(0);
     LongNumber high(1);
     LongNumber epsilon(5E-1);
-
     const LongNumber tenConst(10);
     const LongNumber oneTenthConst(1E-1);
     const LongNumber oneSecondConst(5E-1);

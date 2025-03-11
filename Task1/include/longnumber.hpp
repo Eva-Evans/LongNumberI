@@ -1,4 +1,4 @@
-// Copyright 2025 Vladislav Aleinik
+
 #ifndef LONG_NUMBER_HPP
 #define LONG_NUMBER_HPP
 
@@ -31,7 +31,15 @@ private:
 public:
     static size_t precision;
 
-        LongNumber(int intValue) {
+    LongNumber(int intValue);
+    LongNumber(unsigned unsignedValue);
+    LongNumber(long long longValue);
+    LongNumber(unsigned long long unsignedLongValue);
+    LongNumber(double doubleValue);
+    LongNumber(const std::vector<char>& integerPart_, const std::vector<char>& fractionalPart_, const Sign sign_ = Sign::Positive);
+
+    /*  
+     LongNumber(int intValue) {
             sign = (intValue >= 0) ? Sign::Positive : Sign::Negative;
             intValue = abs(intValue);
 
@@ -44,7 +52,7 @@ public:
             if (integerPart.empty()){
                 integerPart.push_back(0);
             }
-        }
+        } 
 
         LongNumber(unsigned unsignedValue) {
             while (unsignedValue > 0) {
@@ -133,10 +141,11 @@ public:
                 sign = Sign::Positive;
             }
         }
-
+*/
 
     LongNumber(const LongNumber& other) = default; //еонструктор копирования
     LongNumber& operator=(const LongNumber& other) = default; //конструктор присваивания
+    //
 
     ~LongNumber() = default;
     
