@@ -106,11 +106,14 @@ void find_PI() {
     std::chrono::duration<double> time = end - start;
     std::cout << "Time: " << time.count() << '\n';
 }
+
+
+
+
 size_t LongNumber::precision = 50;
 
 int main() {
-
-
+    
     size_t precision;
 
     std::cout << "Enter Pi precision: ";

@@ -1,5 +1,5 @@
 
-// longnumber.cpp
+// src/longnumber.cpp
 #include <algorithm>
 #include <cmath>
 #include "../include/longnumber.hpp"
@@ -137,7 +137,7 @@ std::vector<char> LongNumber::MultiplicationDigComb(const std::vector<char>& num
         return result;
     }
 
-//LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {}
+
 LongNumber findApproximateDivision(const LongNumber& dividend, const LongNumber& divisor) {
     LongNumber low(0);
     LongNumber high(1);
@@ -420,17 +420,14 @@ std::ostream& operator<<(std::ostream& os, const LongNumber& num) {
 std::string LongNumber::to_string() const {
     std::ostringstream oss;
 
-    // Добавляем знак
     if (sign == Sign::Negative) {
         oss << '-';
     }
 
-    // Добавляем целую часть
     for (char digit : integerPart) {
         oss << static_cast<int>(digit);
     }
 
-    // Добавляем дробную часть, если она есть
     if (!fractionalPart.empty()) {
         oss << '.';
         for (char digit : fractionalPart) {
