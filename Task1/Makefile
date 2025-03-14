@@ -1,4 +1,4 @@
-# Copyright 2025 Vladislav Aleinik
+
 
 # Как пользоваться данным шаблоном Makefile:
 # 1. Запишите список своих файлов реализации в переменную SOURCES.
@@ -86,7 +86,8 @@ RESET   = \033[0m      # Сброс всех изменений цвета и с
 
 # Явно заданный список заголовочных файлов.
 INCLUDES = \
-	include/longnumber.hpp
+	include/longnumber.hpp\
+	include/test_system.hpp
 
 # Добавляем директорию include в качестве дополнительной директории для поиска заголовочных файлов.
 CXXFLAGS += -I $(abspath include)
@@ -94,7 +95,8 @@ CXXFLAGS += -I $(abspath include)
 # Список файлов реализации.
 SOURCES = \
 	src/longnumber.cpp \
-	src/main.cpp
+	src/main.cpp \
+	src/test_system.cpp
 #	src/vector.cpp
 
 # Составляем список объектных файлов.

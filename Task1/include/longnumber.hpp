@@ -1,4 +1,4 @@
-
+//longnumber.hpp
 #ifndef LONG_NUMBER_HPP
 #define LONG_NUMBER_HPP
 
@@ -163,6 +163,7 @@ public:
 
     std::vector<char> getIntegerPart() const;
     std::vector<char> getFractionalPart() const;
+    std::string to_string() const;
 
     bool operator==(const LongNumber& other) const;
     bool operator!=(const LongNumber& other) const;

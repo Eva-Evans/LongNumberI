@@ -1,3 +1,7 @@
+
+// longnumber.cpp
+#include <algorithm>
+#include <cmath>
 #include "../include/longnumber.hpp"
 
 
@@ -106,28 +110,29 @@ LongNumber::LongNumber(const std::vector<char>& integerPart_, const std::vector<
 
 
 char LongNumber::AdditionDig(const char& dig1, const char& dig2, char& carry) const {
-        char sum = dig1 + dig2 + carry;
-        carry = sum / 10;
-        return sum % 10;
-    }
+    char sum = dig1 + dig2 + carry;
+    carry = sum / 10;
+    return sum % 10;
+}
 
 char LongNumber::SubtractionDig(const char& dig1, const char& dig2, char& borrow) const {
-        char diff = dig1 - dig2 - borrow;
-        borrow = (diff < 0) ? 1 : 0;
-        return (borrow == 1) ? diff + 10 : diff;
-    }
+    char diff = dig1 - dig2 - borrow;
+    borrow = (diff < 0) ? 1 : 0;
+    return (borrow == 1) ? diff + 10 : diff;
+}
+
 
 std::vector<char> LongNumber::MultiplicationDigComb(const std::vector<char>& num1, const std::vector<char>& num2) const {
-        std::vector<char> result(num1.size() + num2.size(), 0);
+    std::vector<char> result(num1.size() + num2.size(), 0);
 
-        for (int i = num1.size() - 1; i >= 0; --i) {
-            char carry = 0;
-            for (int j = num2.size() - 1; j >= 0 || carry != 0; --j) {
-                char current = result[i + j + 1] + num1[i] * (j >= 0 ? num2[j] : 0) + carry;
-                result[i + j + 1] = current % 10;
-                carry = current / 10;
-            }
+    for (int i = num1.size() - 1; i >= 0; --i) {
+        char carry = 0;
+        for (int j = num2.size() - 1; j >= 0 || carry != 0; --j) {
+            char current = result[i + j + 1] + num1[i] * (j >= 0 ? num2[j] : 0) + carry;
+            result[i + j + 1] = current % 10;
+            carry = current / 10;
         }
+    }
 
         return result;
     }
@@ -410,4 +415,28 @@ std::ostream& operator<<(std::ostream& os, const LongNumber& num) {
     }
 
     return os;
+}
+
+std::string LongNumber::to_string() const {
+    std::ostringstream oss;
+
+    // Добавляем знак
+    if (sign == Sign::Negative) {
+        oss << '-';
+    }
+
+    // Добавляем целую часть
+    for (char digit : integerPart) {
+        oss << static_cast<int>(digit);
+    }
+
+    // Добавляем дробную часть, если она есть
+    if (!fractionalPart.empty()) {
+        oss << '.';
+        for (char digit : fractionalPart) {
+            oss << static_cast<int>(digit);
+        }
+    }
+
+    return oss.str();
 }
