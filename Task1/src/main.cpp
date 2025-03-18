@@ -1,6 +1,8 @@
 #include <iostream>
 #include <chrono>
 #include <assert.h>
+#include <iomanip>
+#include <cmath>
 #include "../include/longnumber.hpp"
 #include "../include/test_system.hpp"
 
@@ -86,27 +88,14 @@ bool test_division() {
 }
 
 
-void find_PI() {
-    auto start = std::chrono::high_resolution_clock::now();
-
-    LongNumber Pi(0);
-    LongNumber hex(1);
-    for(int k = 0; k < 0.8 * LongNumber::precision + 5; k++) {
-        LongNumber sec = LongNumber(4) / LongNumber(8 * k + 1);
-        LongNumber third = LongNumber(2) / LongNumber(8 * k + 4);
-        LongNumber fourth = LongNumber(1) / LongNumber(8 * k + 5);
-        LongNumber fifth = LongNumber(1) / LongNumber(8 * k + 6);
-        Pi = Pi + (sec - third - fourth - fifth) * hex;
-        hex = hex / LongNumber(16);
+double arctan_taylor(double x, int terms) {
+    double result = 0.0;
+    for (int n = 0; n < terms; ++n) {
+        double term = std::pow(-1, n) * std::pow(x, 2 * n + 1) / (2 * n + 1);
+        result += term;
     }
-
-    std::cout << Pi << '\n';
-
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> time = end - start;
-    std::cout << "Time: " << time.count() << '\n';
+    return result;
 }
-
 
 
 
@@ -118,42 +107,23 @@ int main() {
 
     std::cout << "Enter Pi precision: ";
     std::cin >> precision;
+    LongNumber::precision = precision;
+    int terms = 1000000;
+
+    double arctan_1_5 = arctan_taylor(1.0 / 5, terms);
+    double arctan_1_239 = arctan_taylor(1.0 / 239, terms);
+    long double pi = 16 * arctan_1_5 - 4 * arctan_1_239;
+    std::cout << "Calculated Pi: " << std::setprecision(precision) << pi << std::endl;
+    std::cout << "Actual Pi:     " << std::setprecision(precision) << M_PI << std::endl;
 
     LongNumber::precision = precision;
 
-    find_PI();
+    TestSystem::run_test("AdditionDig", test_addition);
+    TestSystem::run_test("SubtractionDig", test_subtraction);
+    TestSystem::run_test("MultiplicationDigComb", test_multiplication);
+    TestSystem::run_test("findApproximateDivision", test_division);
 
-    try {
-        std::cout << "Running Addition test...\n";
-        TestResult addition_result = TestSystem::run_test("Addition", test_addition);
-        std::cout << "Addition test completed with result: " << (addition_result == OK ? "PASS" : "FAIL") << "\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Exception in Addition test: " << e.what() << "\n";
-    }
 
-    try {
-        std::cout << "Running Subtraction test...\n";
-        TestResult subtraction_result = TestSystem::run_test("Subtraction", test_subtraction);
-        std::cout << "Subtraction test completed with result: " << (subtraction_result == OK ? "PASS" : "FAIL") << "\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Exception in Subtraction test: " << e.what() << "\n";
-    }
-
-    try {
-        std::cout << "Running Multiplication test...\n";
-        TestResult multiplication_result = TestSystem::run_test("Multiplication", test_multiplication);
-        std::cout << "Multiplication test completed with result: " << (multiplication_result == OK ? "PASS" : "FAIL") << "\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Exception in Multiplication test: " << e.what() << "\n";
-    }
-
-    try {
-        std::cout << "Running Division test...\n";
-        TestResult division_result = TestSystem::run_test("Division", test_division);
-        std::cout << "Division test completed with result: " << (division_result == OK ? "PASS" : "FAIL") << "\n";
-    } catch (const std::exception& e) {
-        std::cerr << "Exception in Division test: " << e.what() << "\n";
-    }
 
     return 0;
 }
